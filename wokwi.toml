@@ -1,4 +1,0 @@
-[wokwi]
-version = 1
-firmware = '.pio/build/nodemcu-32s/frimware.bin'
-elf = '.pio/build/nodemcu-32s/frimware.elf'
