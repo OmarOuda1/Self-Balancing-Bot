@@ -77,63 +77,6 @@ MD_EyePair E[MAX_EYE_PAIR];
 // MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE,DATA_PIN,CLK_PIN, CS_PIN, MAX_DEVICES);
 // MD_MAX72XX mx = MD_MAX72XX(DATA_PIN,CS_PIN, MAX_DEVICES);
 
-const uint8_t IMAGES[][8] = {
-{
-  0b00000000,
-  0b00111100,
-  0b01000010,
-  0b10011001,
-  0b01000010,
-  0b00111100,
-  0b00000000,
-  0b00000000
-},{
-  0b00000000,
-  0b00111100,
-  0b01011010,
-  0b10000001,
-  0b01000010,
-  0b00111100,
-  0b00000000,
-  0b00000000
-},{
-  0b00000000,
-  0b00111100,
-  0b01000010,
-  0b10001101,
-  0b01000010,
-  0b00111100,
-  0b00000000,
-  0b00000000
-},{
-  0b00000000,
-  0b00111100,
-  0b01000010,
-  0b10000001,
-  0b01011010,
-  0b00111100,
-  0b00000000,
-  0b00000000
-},{
-  0b00000000,
-  0b00111100,
-  0b01000010,
-  0b10110001,
-  0b01000010,
-  0b00111100,
-  0b00000000,
-  0b00000000
-},{
-  0b00000000,
-  0b00111100,
-  0b01000010,
-  0b10011001,
-  0b01000010,
-  0b00111100,
-  0b00000000,
-  0b00000000
-}};
-const int IMAGES_LEN = sizeof(IMAGES)/8;
 /********** MPU **********/
 #include <I2Cdev.h>
 #include <MPU6050_6Axis_MotionApps20.h>
@@ -277,34 +220,6 @@ void bluetooth_task(void * parameter) {
     }
 }
 
-const uint8_t PROGMEM smiley[] = {
-  B00111100,
-  B01111110,
-  B11111111,
-  B11111111,
-  B11111111,
-  B11111111,
-  B01111110,
-  B00111100
-};
-
-const uint8_t PROGMEM sad[] = {
-  B00001100,
-  B00011100,
-  B00111000,
-  B00110000,
-  B00110000,
-  B00111000,
-  B00011100,
-  B00001100
-};
-
-// Function to display a bitmap on a specific module
-void displayBitmap(uint8_t device, const uint8_t *bitmap) {
-  for (uint8_t row = 0; row < 8; row++) {
-    mx.setRow(device, row, pgm_read_byte(&bitmap[row]));
-  }
-}
 
 void dot_matrix_task(void * parameter) {
     while (true)
