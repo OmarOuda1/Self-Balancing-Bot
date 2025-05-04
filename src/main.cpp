@@ -64,9 +64,11 @@ float speedRight = 0;
 #define CS_PIN   5  // CS pins of both modules 
 #define CLK_PIN  18  // CLK pin 
 
-MD_MAX72XX mx=MD_MAX72XX(HARDWARE_TYPE,CS_PIN,MAX_DEVICES) ;
-
 #define MAX_EYE_PAIR (MAX_DEVICES/2)
+
+int INTENSITY = 2;
+
+MD_MAX72XX mx=MD_MAX72XX(HARDWARE_TYPE,CS_PIN,MAX_DEVICES) ;
 
 MD_EyePair E[MAX_EYE_PAIR];
 
@@ -166,55 +168,59 @@ void bluetooth_task(void * parameter) {
         
             // Split command into parts
             int spaceIndex = command.indexOf(' ');
-            int colinIndex = command.indexOf(':');
-            if (colinIndex == -1) {
-                if (spaceIndex == -1) {
-                    SerialBT.println("Invalid command format");
-                    continue;
-                }
-                String key = command.substring(0, spaceIndex);
-                String valueStr = command.substring(spaceIndex + 1);
-                double value = valueStr.toDouble();
-                // Update variables based on command
-                if (key == "p") {
-                    kP = value;
-                    pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
-                    SerialBT.print("kP updated to: ");
-                } else if (key == "d") { 
-                    pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
-                    kD = value;
-                    SerialBT.print("kD updated to: ");
-                    SerialBT.println(value);
-                } else if (key == "i") {
-                    pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
-                    kI = value;
-                    SerialBT.print("kI updated to: ");
-                    SerialBT.println(value);
-                } else if (key == "set") {
-                    setpoint = value;
-                    SerialBT.print("Setpoint updated to: ");
-                    SerialBT.println(value);
-                } else if (key == "mull") {
-                    MULL = value;
-                    SerialBT.print("Mull updated to: ");
-                    SerialBT.println(value);
-                } else if(key == "show") {
-                    SerialBT.printf("The current angle is: %.4f \n",pitch);
-                    SerialBT.printf("The current output is: %.4f \n",speedLeft);
-                    SerialBT.printf("The current Setpoint is: %.4f \n",setpoint);
-                    SerialBT.printf("The current kP is: %.4f \n",kP);
-                    SerialBT.printf("The current kD is: %.4f \n",kD);
-                    SerialBT.printf("The current kI is: %.4f \n",kI);
-                    SerialBT.printf("The current MULL is: %.4f \n",MULL);
-                } else if (key=="mreset") {
-                    mpu.resetDMP();
-                } else {
-                    SerialBT.println("Unknown command");
-                }
-                SerialBT.printf("The current angle is: %.4f \n",pitch);
-                SerialBT.printf("The current output is: %.4f \n",speedLeft);
+            if (spaceIndex == -1) {
+                SerialBT.println("Invalid command format");
                 continue;
             }
+            String key = command.substring(0, spaceIndex);
+            String valueStr = command.substring(spaceIndex + 1);
+            double value = valueStr.toDouble();
+            // Update variables based on command
+            if (key == "p") {
+                kP = value;
+                pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
+                SerialBT.print("kP updated to: ");
+            } else if (key == "d") { 
+                pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
+                kD = value;
+                SerialBT.print("kD updated to: ");
+                SerialBT.println(value);
+            } else if (key == "i") {
+                pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
+                kI = value;
+                SerialBT.print("kI updated to: ");
+                SerialBT.println(value);
+            } else if (key == "set") {
+                setpoint = value;
+                SerialBT.print("Setpoint updated to: ");
+                SerialBT.println(value);
+            } else if (key == "bright") {
+                INTENSITY = value;
+                mx.control(MD_MAX72XX::INTENSITY,INTENSITY);
+                SerialBT.print("Intensity updated to: ");
+                SerialBT.println(value);
+            } else if (key == "mull") {
+                MULL = value;
+                SerialBT.print("Mull updated to: ");
+                SerialBT.println(value);
+            } else if(key == "show") {
+                SerialBT.printf("The current angle is: %.4f \n",pitch);
+                SerialBT.printf("The current output is: %.4f \n",speedLeft);
+                SerialBT.printf("The current Setpoint is: %.4f \n",setpoint);
+                SerialBT.printf("The current kP is: %.4f \n",kP);
+                SerialBT.printf("The current kD is: %.4f \n",kD);
+                SerialBT.printf("The current kI is: %.4f \n",kI);
+                SerialBT.printf("The current MULL is: %.4f \n",MULL);
+                SerialBT.printf("The current intensity is: %.4f \n",INTENSITY);
+            } else if (key=="mreset") {
+                mpu.resetFIFO();
+            } else {
+                SerialBT.println("Unknown command");
+            }
+            SerialBT.printf("The current angle is: %.4f \n",pitch);
+            SerialBT.printf("The current output is: %.4f \n",speedLeft);
+            continue;
+            
         }
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
@@ -319,7 +325,7 @@ void setup() {
     leftmotor.SetMotorSpeed(0);
     /*************DotMatrix*******/
     mx.begin();
-    mx.control(MD_MAX72XX::INTENSITY,5);
+    mx.control(MD_MAX72XX::INTENSITY,INTENSITY);
 
      // initialize the eye view
     for (uint8_t i=0; i<MAX_EYE_PAIR; i++){
