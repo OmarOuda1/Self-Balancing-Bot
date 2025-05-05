@@ -7,7 +7,7 @@
  - ESP32-WROOM
  - 2 × Dot Matrix Displays
  - Boost Converters
- - Litium Battery
+ - Lithium Battery
  - Electrolytic Capacitor
 
 ### Software 💾
