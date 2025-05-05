@@ -72,7 +72,6 @@ MD_MAX72XX mx=MD_MAX72XX(HARDWARE_TYPE,CS_PIN,MAX_DEVICES) ;
 
 MD_EyePair E[MAX_EYE_PAIR];
 
-// Miscellaneous defines
 #define	DELAYTIME  500  // in milliseconds
 
 
@@ -178,16 +177,16 @@ void bluetooth_task(void * parameter) {
             // Update variables based on command
             if (key == "p") {
                 kP = value;
-                pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
+                pid.SetTunings(kP,kI,kD); 
                 SerialBT.print("kP updated to: ");
             } else if (key == "d") { 
-                pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
                 kD = value;
+                pid.SetTunings(kP,kI,kD); 
                 SerialBT.print("kD updated to: ");
                 SerialBT.println(value);
             } else if (key == "i") {
-                pid.SetTunings(kP,kI,kD); // Add a condition so it only runs if and of the values change
                 kI = value;
+                pid.SetTunings(kP,kI,kD); 
                 SerialBT.print("kI updated to: ");
                 SerialBT.println(value);
             } else if (key == "set") {
@@ -230,20 +229,6 @@ void bluetooth_task(void * parameter) {
 void dot_matrix_task(void * parameter) {
     while (true)
     {
-        // // Display smiley face on Module 0
-        // displayBitmap(0, smiley);
-
-        // // Display sad face on Module 1
-        // displayBitmap(1, sad);
-
-        // vTaskDelay(DELAYTIME/portTICK_PERIOD_MS);
-
-        // // Swap images
-        // displayBitmap(0, sad);
-        // displayBitmap(1, smiley);
-
-        // vTaskDelay(DELAYTIME/portTICK_PERIOD_MS);
-
         for (uint8_t i=0; i<MAX_EYE_PAIR; i++) {
             E[i].animate();
         }
@@ -349,7 +334,7 @@ void loop() {
     
     pitch = (ypr[1] * 180/M_PI); // adjust to degrees
 
-    // reset the FIFO in case of gimbal lock
+    // reset the FIFO buffer in case of gimbal lock
     if (abs(pitch) >= 95) {
         mpu.resetFIFO();
     }
@@ -368,9 +353,6 @@ void loop() {
     speedRight = output + turnV;    
     
     // move motors
-    // rightmotor.SetMotorSpeed(speedRight*10);
-    // leftmotor.SetMotorSpeed(speedLeft*10);
-    // delay(10);
     rightmotor.SetMotorSpeed(speedRight*MULL);
     leftmotor.SetMotorSpeed(speedLeft);
 
