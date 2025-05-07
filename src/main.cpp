@@ -213,6 +213,13 @@ void bluetooth_task(void * parameter) {
                 SerialBT.printf("The current intensity is: %.4f \n",INTENSITY);
             } else if (key=="mreset") {
                 mpu.resetFIFO();
+            } else if (key=="reset") {
+                kP=24;
+                kD=1.2;
+                kI=50;
+                pid.SetTunings(kP,kI,kD); 
+                SerialBT.println("All The PID tunings has been reset.");
+                SerialBT.printf("KP=%.4f, KD=%.4f, KI=%.4f \n",kP,kD,kI);
             } else {
                 SerialBT.println("Unknown command");
             }
