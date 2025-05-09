@@ -25,7 +25,7 @@ float angleV = 0, turnV = 0; // values from remote controller
 // #define IN2_A 27
 
 #define IN1_A 27
-#define IN2_A 13 // change this pin to 13 to avoid unwanted motor movement at startup as pin 14 outputs a pwm signal at startup
+#define IN2_A 13 
 
 // #define IN3_B 25
 // #define IN4_B 26
@@ -74,10 +74,6 @@ MD_EyePair E[MAX_EYE_PAIR];
 
 #define	DELAYTIME  500  // in milliseconds
 
-
-// MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE,DATA_PIN,CLK_PIN, CS_PIN, MAX_DEVICES);
-// MD_MAX72XX mx = MD_MAX72XX(DATA_PIN,CS_PIN, MAX_DEVICES);
-
 /********** MPU **********/
 #include <I2Cdev.h>
 #include <MPU6050_6Axis_MotionApps20.h>
@@ -87,7 +83,7 @@ MD_EyePair E[MAX_EYE_PAIR];
 
 // class default I2C address is 0x68
 // specific I2C addresses may be passed as a parameter here
-// AD0 low = 0x68 (default forothers/Self-Balancing-Robot-master/Code/readAngles.cpp SparkFun breakout and InvenSense evaluation board)
+// AD0 low = 0x68 
 // AD0 high = 0x69
 MPU6050 mpu;
 //MPU6050 mpu(0x69); // <-- use for AD0 high
@@ -102,18 +98,10 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 
 // orientation/motion vars
 Quaternion q;           // [w, x, y, z]         quaternion container
-// VectorInt16 aa;         // [x, y, z]            accel sensor measurements
-// VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
-// VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
 VectorFloat gravity;    // [x, y, z]            gravity vector
-// float euler[3];         // [psi, theta, phi]    Euler angle container
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
 float pitch;
-// long velocity;
-
-//float trimPot;
-//float trimAngle;
 
 int IMUdataReady = 0;
 volatile bool mpuInterrupt = false;
@@ -213,6 +201,7 @@ void bluetooth_task(void * parameter) {
                 SerialBT.printf("The current intensity is: %.4f \n",INTENSITY);
             } else if (key=="mreset") {
                 mpu.resetFIFO();
+                SerialBT.println("The FIFO buffer has been reset.");
             } else if (key=="reset") {
                 kP=24;
                 kD=1.2;
@@ -220,11 +209,21 @@ void bluetooth_task(void * parameter) {
                 pid.SetTunings(kP,kI,kD); 
                 SerialBT.println("All The PID tunings has been reset.");
                 SerialBT.printf("KP=%.4f, KD=%.4f, KI=%.4f \n",kP,kD,kI);
+            } else if (key=="help") {
+                SerialBT.println("\
+                   Available command are:- \n \
+                   p <value> to edit kP.\n \
+                   d <vlaue> to edit kD.\n \
+                   i <value> to edit kI.\n \
+                   set <value> to edit the setpoint.\n \
+                   mull <vlaue> to edit the speed multiplier.\n \
+                   bright <vlaue> to edit the brightness of the dot matrix.\n \
+                   mreset <any number> to reset the FIFO buffer.\n \
+                   reset <any number> to reset the tuning values.\n \
+                   show <any number> to show the current values and states.");
             } else {
                 SerialBT.println("Unknown command");
             }
-            SerialBT.printf("The current angle is: %.4f \n",pitch);
-            SerialBT.printf("The current output is: %.4f \n",speedLeft);
             continue;
             
         }
@@ -349,8 +348,6 @@ void loop() {
     // PID vars
     setpoint += angleV; 
     input = pitch;
-    // Serial.print("The current pitch is: ");
-    // Serial.print(pitch);
     
     
     pid.Compute();
