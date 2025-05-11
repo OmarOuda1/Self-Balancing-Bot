@@ -3,10 +3,10 @@
 /********** PID **********/
 #include <PID_v1.h>
 
-double kP = 24;
+double kP = 16;
 // double kI = 350;
 double kI = 50;
-double kD = 1.2;
+double kD = 0.4;
 
 double setpoint, input, output;   // PID variables
 PID pid(&input, &output, &setpoint, kP, kI, kD, DIRECT); // PID setup
@@ -37,7 +37,6 @@ float angleV = 0, turnV = 0; // values from remote controller
 #define PWM_MOTOR_FREQUENCY   100
 #define PWM_MOTOR_RESOLUTION    8
 
-// #define MULL 1.16
 
 L293D rightmotor(IN1_A,IN2_A,EN_A,0);
 L293D leftmotor(IN3_B,IN4_B,EN_B,1);
@@ -112,7 +111,6 @@ void dmpDataReady() {
 
 
 // function that actually read the angle when the flag is set by the ISR
-
 void readAngles()  {
 
     mpuIntStatus = mpu.getIntStatus();
@@ -166,7 +164,46 @@ void bluetooth_task(void * parameter) {
             if (key == "p") {
                 kP = value;
                 pid.SetTunings(kP,kI,kD); 
-                SerialBT.print("kP updated to: ");
+                SerialBT.println("kP updated to: ");
+                SerialBT.println(value);
+            } else if (key=="tune") {
+                switch (int(value))
+                {
+                case 1:
+                    kP=24;
+                    kD=1.2;
+                    kI=50;
+                    pid.SetTunings(kP,kI,kD); 
+                    SerialBT.println("All The PID tunings has been reset.");
+                    SerialBT.printf("KP=%.4f, KD=%.4f, KI=%.4f \n",kP,kD,kI);
+                    break;
+                case 2:
+                    kP=16;
+                    kD=1.2;
+                    kI=50;
+                    pid.SetTunings(kP,kI,kD); 
+                    SerialBT.println("All The PID tunings has been changed to:-");
+                    SerialBT.printf("KP=%.4f, KD=%.4f, KI=%.4f \n",kP,kD,kI);
+                    break;
+                case 3:
+                    kP=35;
+                    kD=1.249;
+                    kI=70;
+                    pid.SetTunings(kP,kI,kD); 
+                    SerialBT.println("All The PID tunings has been changed to:-");
+                    SerialBT.printf("KP=%.4f, KD=%.4f, KI=%.4f \n",kP,kD,kI);
+                    break;
+                case 4:
+                    kP=20;
+                    kD=1.3;
+                    kI=40;
+                    pid.SetTunings(kP,kI,kD); 
+                    SerialBT.println("All The PID tunings has been changed to:-");
+                    SerialBT.printf("KP=%.4f, KD=%.4f, KI=%.4f \n",kP,kD,kI);
+                    break;
+                default:
+                    break;
+                }
             } else if (key == "d") { 
                 kD = value;
                 pid.SetTunings(kP,kI,kD); 
@@ -203,8 +240,8 @@ void bluetooth_task(void * parameter) {
                 mpu.resetFIFO();
                 SerialBT.println("The FIFO buffer has been reset.");
             } else if (key=="reset") {
-                kP=24;
-                kD=1.2;
+                kP=16;
+                kD=0.4;
                 kI=50;
                 pid.SetTunings(kP,kI,kD); 
                 SerialBT.println("All The PID tunings has been reset.");
@@ -224,7 +261,6 @@ void bluetooth_task(void * parameter) {
             } else {
                 SerialBT.println("Unknown command");
             }
-            continue;
             
         }
         vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -271,7 +307,7 @@ void setup() {
     );
 
 /********** MPU **********/
-    setpoint = 0;
+    setpoint = 1;
     // initialize device
     mpu.initialize();
     devStatus = mpu.dmpInitialize();
@@ -327,9 +363,9 @@ void setup() {
         "Dot_Matrix",
         8192,
         NULL,
-        1,
+        0,
         NULL,
-        1
+        0
     );
 }
 
