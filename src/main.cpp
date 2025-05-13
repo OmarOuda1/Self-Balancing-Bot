@@ -293,7 +293,6 @@ void setup() {
 /**********Bluetooth*********/
     if (!SerialBT.begin("ESP32_Controller")) { // Bluetooth device name
         Serial.println("Bluetooth initialization failed!");
-        // while (1);
     }
     Serial.println("Bluetooth device is ready to pair");
     xTaskCreatePinnedToCore(
@@ -340,7 +339,6 @@ void setup() {
     }
     
     pid.SetMode(AUTOMATIC);
-    // pid.SetOutputLimits(-255,255);
     pid.SetOutputLimits(-100,100);
     pid.SetSampleTime(10);
 
